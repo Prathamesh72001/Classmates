@@ -1,0 +1,69 @@
+.rounded-button {
+    padding: 10px 20px;
+    border: 2px solid black;
+    border-radius: 25px;
+    /* Rounded corners */
+    background-color: #fefcc1;
+    /* Green background */
+    color: black;
+    /* White text */
+    font-size: calc(5px + 2vmin);
+    /* Text size */
+    font-weight: bold;
+    font-family: 'Baloo 2', cursive;
+    cursor: pointer;
+    /* Pointer cursor on hover */
+    /* Shadow effect */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    /* Smooth hover effect */
+}
+
+.rounded-button:hover {
+    transform: translateY(-2px);
+    /* Slight upward movement */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+    /* Enhanced shadow on hover */
+}
+
+.rounded-button:active {
+    transform: translateY(1px);
+    /* Slight downward movement on click */
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    /* Reduced shadow on click */
+}
+
+.title{
+    color: black;
+    /* White text */
+    font-size: calc(10px + 5vmin);
+    /* Text size */
+    font-weight: bold;
+    font-family: 'Baloo 2', cursive;
+    cursor: pointer;
+}
+
+.menu.active {
+    background-color: #fefcc1 !important;
+    color: black !important;
+    padding: 8px 15px;
+    /* Add padding for better spacing */
+    border-radius: 5px;
+    /* Rounded corners */
+    font-family: 'Baloo 2', cursive;
+    font-size: calc(5px + 2vmin);
+    text-align: start;
+}
+
+.menu {
+    background-color: #ffffff;
+    /* Different color for active tab */
+    color: black;
+    font-weight: bold;
+    padding: 8px 15px;
+    /* Add padding for better spacing */
+    border-radius: 5px;
+    /* Rounded corners */
+    font-family: Arial, sans-serif;
+    font-size: calc(5px + 2vmin);
+    text-align: start;
+}
