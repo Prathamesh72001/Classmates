@@ -37,6 +37,7 @@
     /* White text */
     font-size: calc(10px + 5vmin);
     /* Text size */
+    text-align: center;
     font-weight: bold;
     font-family: 'Baloo 2', cursive;
     cursor: pointer;
@@ -46,10 +47,18 @@
     background-color: #fefcc1 !important;
     color: black !important;
     padding: 8px 15px;
+    margin-top: 3px;
+    margin-bottom: 3px;
     /* Add padding for better spacing */
-    border-radius: 5px;
+
+    border-radius: 10px;
     /* Rounded corners */
+    font-weight: bold;
     font-family: 'Baloo 2', cursive;
+    cursor: pointer;
+    /* Pointer cursor on hover */
+    /* Shadow effect */
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
     font-size: calc(5px + 2vmin);
     text-align: start;
 }
@@ -60,10 +69,15 @@
     color: black;
     font-weight: bold;
     padding: 8px 15px;
+    margin-top: 3px;
+    margin-bottom: 3px;
     /* Add padding for better spacing */
-    border-radius: 5px;
+    border-radius: 10px;
     /* Rounded corners */
-    font-family: Arial, sans-serif;
+    font-family: 'Baloo 2', cursive;
     font-size: calc(5px + 2vmin);
     text-align: start;
+    cursor: pointer;
+    /* Pointer cursor on hover */
+    /* Shadow effect */
 }

@@ -1,0 +1,48 @@
+/* Default border color */
+.textfield .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+  border-color: gray;
+  color: black;
+  /* White text */
+  font-size: calc(5px + 2vmin);
+  /* Text size */
+  text-align: start;
+  font-weight: bold;
+  font-family: "Baloo 2", cursive;
+}
+
+/* Change border color on hover */
+.textfield .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: black;
+  color: black;
+  /* White text */
+  font-size: calc(5px + 2vmin);
+  /* Text size */
+  text-align: start;
+  font-weight: bold;
+  font-family: "Baloo 2", cursive;
+  
+}
+
+/* Change border color on focus */
+.textfield .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: black;
+  color: black;
+  /* White text */
+  font-size: calc(5px + 2vmin);
+  /* Text size */
+  text-align: start;
+  font-weight: bold;
+  font-family: "Baloo 2", cursive;
+}
+
+/* Change label color on focus */
+.textfield .MuiInputLabel-root.Mui-focused {
+  border-color: black;
+  color: black;
+  /* White text */
+  font-size: calc(5px + 2vmin);
+  /* Text size */
+  text-align: start;
+  font-weight: bold;
+  font-family: "Baloo 2", cursive;
+}

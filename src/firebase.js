@@ -1,6 +1,6 @@
 // src/firebase.js
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 
 // 🔹 Replace with your Firebase Config
@@ -21,6 +21,7 @@ const app = initializeApp(firebaseConfig);
 
 // 🔹 Export Firebase Services
 export const auth = getAuth(app);         // Authentication
-export const analytics = getAnalytics(app);      // Firestore Database
+export const analytics = getAnalytics(app); 
+export { RecaptchaVerifier, signInWithPhoneNumber };     // Firestore Database
 export default app;
 
