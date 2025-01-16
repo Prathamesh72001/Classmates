@@ -17,6 +17,7 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import "../home/Home.css";
 import "./Auth.css";
+import OTPInput from "otp-input-react";
 
 const Signup = () => {
   const [step, setStep] = useState(1);
@@ -44,7 +45,11 @@ const Signup = () => {
   const handlePhoneChange = (value, country) => {
     const countryCodeLength = country.dialCode.length || 0;
     const phoneNumber = value.substring(countryCodeLength);
-    setUserData((prevData) => ({ ...prevData,countryCode: country.dialCode, phone: phoneNumber }));
+    setUserData((prevData) => ({
+      ...prevData,
+      countryCode: country.dialCode,
+      phone: phoneNumber,
+    }));
   };
 
   // Handle Next Button (Move to Step 2)
@@ -55,7 +60,7 @@ const Signup = () => {
   };
 
   // Handle Phone Verification
-  const sendOTP = async () => {
+  const verifyCaptcha = async () => {
     if (!validatePhoneNumber(userData.phone)) return;
 
     try {
@@ -64,16 +69,31 @@ const Signup = () => {
         "recaptcha-container",
         {
           size: "invisible",
+          callback: (response) => {
+            console.log("reCAPTCHA verified!");
+          },
         }
       );
 
-      const result = await signInWithPhoneNumber(
-        auth,
-        `+${userData.countryCode}${userData.phone}`,
-        window.recaptchaVerifier
-      );
+      sendOTP();
+    } catch (error) {
+      console.error("Error Verifying Captcha:", error);
+    }
+  };
 
-      setConfirmationResult(result);
+  const sendOTP = async () => {
+    try {
+      const phoneNumber = `+${userData.countryCode}${userData.phone}`;
+      console.log(phoneNumber);
+      const appVerifier = window.recaptchaVerifier;
+      const confirmationResult = await signInWithPhoneNumber(
+        auth,
+        phoneNumber,
+        appVerifier
+      );
+      window.confirmationResult = confirmationResult;
+      console.log("OTP Sent Successfully!");
+      setConfirmationResult(confirmationResult);
       setShowOTP(true);
     } catch (error) {
       console.error("Error sending OTP:", error);
@@ -81,28 +101,27 @@ const Signup = () => {
   };
 
   // Handle OTP Verification
-    const verifyOTP = async () => {
-      if (!validateOTP()) return;
-      let newErrors = {};
-      try {
-        await confirmationResult.confirm(userData.otp);
-        toast.success(`✅ Logged In Successfully`, {
-          position: "top-right",
-          autoClose: 3000,
-        });
-        navigate("/");
-      } catch (error) {
-        console.error("Invalid OTP:", error);
-        toast.error("❌ Invalid OTP! Please check and try again.", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-        newErrors.otp = "Invalid OTP";
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-      }
-    };
-  
+  const verifyOTP = async () => {
+    if (!validateOTP()) return;
+    let newErrors = {};
+    try {
+      await confirmationResult.confirm(userData.otp);
+      toast.success(`Signed Up Successfully`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      navigate("/");
+    } catch (error) {
+      console.error("Invalid OTP:", error);
+      toast.error("Invalid OTP! Please check and try again.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      newErrors.otp = "Invalid OTP";
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    }
+  };
 
   // Validate Form Fields
   const validateStep1 = () => {
@@ -277,22 +296,46 @@ const Signup = () => {
                 backgroundColor: "black",
                 color: "white",
               }}
-              onClick={sendOTP}
+              onClick={verifyCaptcha}
               sx={{ mt: 2 }}
             >
               Send OTP
             </button>
           ) : (
             <>
-              <TextField
-                label="Enter OTP"
-                name="otp"
-                fullWidth
-                margin="normal"
-                onChange={handleChange}
-                error={!!errors.otp}
-                helperText={errors.otp}
+              <OTPInput
+                value={userData.otp}
+                onChange={(c) =>
+                  setUserData((prevData) => ({
+                    ...prevData,
+                    otp: c,
+                  }))
+                }
+                //   onChange={(otp) => setCode(otp)}
+                OTPLength={6}
+                otpType="number"
+                disabled={false}
+                inputStyles={{
+                  border: errors.otp
+                    ? "1px solid red"
+                    : "1px solid transparent",
+                  borderRadius: "8px",
+                  // width: window.innerWidth < "500" ? "30px" : "55px",
+                  // height: window.innerWidth < "500" ? "30px" : "55px",
+                  fontSize: "16px",
+                  background: "#F5F5F5",
+                  fontWeight: "400",
+
+                  // caretColor: "black",
+                }}
               />
+
+              <span
+                className="text-danger fs14 my-2 d-block fw-bold"
+                style={{ marginBottom: "20px", color: "red" }}
+              >
+                {errors.otp}
+              </span>
               <button
                 className="rounded-button"
                 style={{

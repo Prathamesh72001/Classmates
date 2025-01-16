@@ -10,6 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { auth, RecaptchaVerifier, signInWithPhoneNumber } from "../../firebase";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
@@ -94,14 +95,14 @@ const Login = () => {
     let newErrors = {};
     try {
       await confirmationResult.confirm(userData.otp);
-      toast.success(`✅ Logged In Successfully`, {
+      toast.success(`Logged In Successfully`, {
         position: "top-right",
         autoClose: 3000,
       });
       navigate("/");
     } catch (error) {
       console.error("Invalid OTP:", error);
-      toast.error("❌ Invalid OTP! Please check and try again.", {
+      toast.error("Invalid OTP! Please check and try again.", {
         position: "top-right",
         autoClose: 3000,
       });
