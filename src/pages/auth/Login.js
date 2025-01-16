@@ -10,13 +10,13 @@ import {
   Typography,
 } from "@mui/material";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { auth, RecaptchaVerifier, signInWithPhoneNumber } from "../../firebase";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import "../home/Home.css";
 import "./Auth.css";
 import { useNavigate } from "react-router-dom";
+import OTPInput from "otp-input-react";
 
 const Login = () => {
   const [step, setStep] = useState(1);
@@ -48,7 +48,7 @@ const Login = () => {
   };
 
   // Handle Phone Verification
-  const sendOTP = async () => {
+  const verifyCaptcha = async () => {
     if (!validatePhoneNumber(userData.phone)) return;
 
     try {
@@ -57,16 +57,31 @@ const Login = () => {
         "recaptcha-container",
         {
           size: "invisible",
+          callback: (response) => {
+            console.log("reCAPTCHA verified!");
+          },
         }
       );
 
-      const result = await signInWithPhoneNumber(
-        auth,
-        `+${userData.countryCode}${userData.phone}`,
-        window.recaptchaVerifier
-      );
+      sendOTP();
+    } catch (error) {
+      console.error("Error Verifying Captcha:", error);
+    }
+  };
 
-      setConfirmationResult(result);
+  const sendOTP = async () => {
+    try {
+      const phoneNumber = `+${userData.countryCode}${userData.phone}`;
+      console.log(phoneNumber);
+      const appVerifier = window.recaptchaVerifier;
+      const confirmationResult = await signInWithPhoneNumber(
+        auth,
+        phoneNumber,
+        appVerifier
+      );
+      window.confirmationResult = confirmationResult;
+      console.log("OTP Sent Successfully!");
+      setConfirmationResult(confirmationResult);
       setShowOTP(true);
     } catch (error) {
       console.error("Error sending OTP:", error);
@@ -177,22 +192,45 @@ const Login = () => {
               backgroundColor: "black",
               color: "white",
             }}
-            onClick={sendOTP}
+            onClick={verifyCaptcha}
             sx={{ mt: 2 }}
           >
             Send OTP
           </button>
         ) : (
           <>
-            <TextField
-              label="Enter OTP"
-              name="otp"
-              fullWidth
-              margin="normal"
-              onChange={handleChange}
-              error={!!errors.otp}
-              helperText={errors.otp}
+            <OTPInput
+              value={userData.otp}
+              onChange={(c) =>
+                setUserData((prevData) => ({
+                  ...prevData,
+                  otp: c,
+                }))
+              }
+              //   onChange={(otp) => setCode(otp)}
+              OTPLength={6}
+              otpType="number"
+              disabled={false}
+              inputStyles={{
+                border: errors.otp ? "1px solid red" : "1px solid transparent",
+                borderRadius: "8px",
+                // width: window.innerWidth < "500" ? "30px" : "55px",
+                // height: window.innerWidth < "500" ? "30px" : "55px",
+                fontSize: "16px",
+                background: "#F5F5F5",
+                fontWeight: "400",
+
+                // caretColor: "black",
+              }}
             />
+
+            <span
+              className="text-danger fs14 my-2 d-block fw-bold"
+              style={{ marginBottom: "20px", color: "red" }}
+            >
+              {errors.otp}
+            </span>
+
             <button
               className="rounded-button"
               style={{
