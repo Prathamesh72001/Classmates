@@ -8,7 +8,15 @@ import {
   ListItemIcon,
   IconButton,
   Box,
+  Typography,
+  Button,
+  CircularProgress,
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
 } from "@mui/material";
+import { AiFillHeart } from "react-icons/ai";
 import {
   HiOutlineMenuAlt2,
   HiOutlineUserAdd,
@@ -17,13 +25,14 @@ import {
   HiOutlineHeart,
   HiOutlineChat,
   HiOutlineUpload,
-  HiOutlineLogout
+  HiOutlineLogout,
 } from "react-icons/hi";
 import { BiCategory } from "react-icons/bi";
 import React, { useState, useEffect, useRef } from "react";
 import "./Home.css";
+import "./CategorySections";
 import { useNavigate } from "react-router-dom";
-
+import CategorySection from "./CategorySections";
 
 function Home() {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -33,13 +42,13 @@ function Home() {
   const navigate = useNavigate();
 
   const menuItems = [
-    {text:"Home", icon:<HiOutlineHome/>},
-    {text:"My Profile", icon:<HiOutlineUser/>},
-    {text:"Categories", icon:<BiCategory/>},
-    {text:"Favourites", icon:<HiOutlineHeart/>},
-    {text:"Suggestions", icon:<HiOutlineChat/>},
-    {text:"Upload", icon:<HiOutlineUpload/>},
-    {text:"Logout", icon:<HiOutlineLogout/>},
+    { text: "Home", icon: <HiOutlineHome /> },
+    { text: "My Profile", icon: <HiOutlineUser /> },
+    { text: "Categories", icon: <BiCategory /> },
+    { text: "Favourites", icon: <HiOutlineHeart /> },
+    { text: "Suggestions", icon: <HiOutlineChat /> },
+    { text: "Upload", icon: <HiOutlineUpload /> },
+    { text: "Logout", icon: <HiOutlineLogout /> },
   ];
 
   const toggleDrawer = (open) => () => {
@@ -63,7 +72,7 @@ function Home() {
   return (
     <div className="App">
       <AppBar
-        position="static"
+        position="fixed"
         style={{ background: "#ffffff", boxShadow: "none" }}
       >
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -83,28 +92,37 @@ function Home() {
           <span className="title">ClassMates</span>
 
           {screenWidth > 1000 ? (
-              <button edge="end" className="rounded-button" onClick={() => navigate("/signup")}>Sign Up</button>
+            <button
+              edge="end"
+              className="rounded-button"
+              onClick={() => navigate("/signup")}
+            >
+              Sign Up
+            </button>
           ) : (
-              <IconButton
-                style={{
-                  color: "#000000",
-                  border: "2px solid black",
-                  background: "#fefcc1",
-                }}
-                edge="end"
-                onClick={() => navigate("/signup")}
-              >
-                <HiOutlineUserAdd />
-              </IconButton>
+            <IconButton
+              style={{
+                color: "#000000",
+                border: "2px solid black",
+                background: "#fefcc1",
+              }}
+              edge="end"
+              onClick={() => navigate("/signup")}
+            >
+              <HiOutlineUserAdd />
+            </IconButton>
           )}
         </Toolbar>
       </AppBar>
-      {/* Drawer */}
+
       <Drawer
         variant={screenWidth > 1000 ? "permanent" : "temporary"}
         anchor="left"
         open={isDrawerOpen}
-        onClose={toggleDrawer(false)} // Close drawer when clicking outside
+        onClose={toggleDrawer(false)}
+        sx={{
+          width: 240,
+        }}
       >
         {/* 🔹 Drawer Header */}
         <Box
@@ -115,7 +133,9 @@ function Home() {
             color: "black",
           }}
         >
-          <button className="rounded-button" onClick={() => navigate("/login")}>Sign In</button>
+          <button className="rounded-button" onClick={() => navigate("/login")}>
+            Sign In
+          </button>
         </Box>
         <List>
           {menuItems.map((item, index) => (
@@ -139,6 +159,14 @@ function Home() {
           ))}
         </List>
       </Drawer>
+
+      <CategorySection title="All Books" filter="" />
+
+      <CategorySection title="SSC Books" filter="SSC" />
+
+      <CategorySection title="XI Books" filter="XI" />
+
+      <CategorySection title="HSC Books" filter="HSC" />
     </div>
   );
 }
