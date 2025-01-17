@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { auth, RecaptchaVerifier, signInWithPhoneNumber } from "../../firebase";
+import { fetchDataByPath, addDataByPath } from "../../realtimedatabase";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import "../home/Home.css";
@@ -35,13 +36,11 @@ const Signup = () => {
   const [showOTP, setShowOTP] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState(null);
 
-  // ✅ Universal handleChange for all input fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  // ✅ Handle PhoneInput separately (as it doesn't provide event object)
   const handlePhoneChange = (value, country) => {
     const countryCodeLength = country.dialCode.length || 0;
     const phoneNumber = value.substring(countryCodeLength);
@@ -52,17 +51,13 @@ const Signup = () => {
     }));
   };
 
-  // Handle Next Button (Move to Step 2)
   const handleNext = () => {
     if (validateStep1()) {
       setStep(2);
     }
   };
 
-  // Handle Phone Verification
   const verifyCaptcha = async () => {
-    if (!validatePhoneNumber(userData.phone)) return;
-
     try {
       window.recaptchaVerifier = new RecaptchaVerifier(
         auth,
@@ -103,20 +98,35 @@ const Signup = () => {
   // Handle OTP Verification
   const verifyOTP = async () => {
     if (!validateOTP()) return;
-    let newErrors = {};
     try {
       await confirmationResult.confirm(userData.otp);
-      toast.success(`Signed Up Successfully`, {
-        position: "top-right",
-        autoClose: 3000,
+      const phoneNumber = `+${userData.countryCode}${userData.phone}`;
+      await addDataByPath(`Users/${phoneNumber}`,userData).then(() => {
+        localStorage.setItem(
+          "user",
+          JSON.stringify(userData)
+        );
+  
+        toast.success(`Signed Up Successfully`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        navigate("/");
+      })
+      .catch((error) => {
+        toast.error("Something Went Wrong. Try Again Later.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
       });
-      navigate("/");
+
     } catch (error) {
       console.error("Invalid OTP:", error);
       toast.error("Invalid OTP! Please check and try again.", {
         position: "top-right",
         autoClose: 3000,
       });
+      let newErrors = {};
       newErrors.otp = "Invalid OTP";
       setErrors(newErrors);
       return Object.keys(newErrors).length === 0;
@@ -138,16 +148,24 @@ const Signup = () => {
   };
 
   // Validate Phone Number
-  const validatePhoneNumber = (value) => {
+  const validatePhoneNumber = async () => {
     let newErrors = {};
-    if (!value.trim()) {
+    if (!userData.phone.trim()) {
       newErrors.phone = "Phone number is required";
-    } else if (!/^\d{10}$/.test(value)) {
+    } else if (!/^\d{10}$/.test(userData.phone)) {
       newErrors.phone = "Enter a valid 10-digit phone number";
+    } else {
+      const phoneNumber = `+${userData.countryCode}${userData.phone}`;
+      const data = await fetchDataByPath(`Users/${phoneNumber}`);
+      console.log(data);
+      if (data != null) {
+        newErrors.phone = "Phone no. already exist";
+      } else {
+        verifyCaptcha();
+      }
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   // Validate OTP
@@ -283,9 +301,6 @@ const Signup = () => {
           {errors.phone && (
             <Typography color="error">{errors.phone}</Typography>
           )}
-
-          <div id="recaptcha-container"></div>
-
           <br />
 
           {!showOTP ? (
@@ -296,7 +311,7 @@ const Signup = () => {
                 backgroundColor: "black",
                 color: "white",
               }}
-              onClick={verifyCaptcha}
+              onClick={validatePhoneNumber}
               sx={{ mt: 2 }}
             >
               Send OTP
@@ -311,7 +326,6 @@ const Signup = () => {
                     otp: c,
                   }))
                 }
-                //   onChange={(otp) => setCode(otp)}
                 OTPLength={6}
                 otpType="number"
                 disabled={false}
@@ -320,13 +334,9 @@ const Signup = () => {
                     ? "1px solid red"
                     : "1px solid transparent",
                   borderRadius: "8px",
-                  // width: window.innerWidth < "500" ? "30px" : "55px",
-                  // height: window.innerWidth < "500" ? "30px" : "55px",
                   fontSize: "16px",
                   background: "#F5F5F5",
                   fontWeight: "400",
-
-                  // caretColor: "black",
                 }}
               />
 
@@ -336,6 +346,7 @@ const Signup = () => {
               >
                 {errors.otp}
               </span>
+
               <button
                 className="rounded-button"
                 style={{

@@ -10,5 +10,6 @@ root.render(
   <BrowserRouter>
     <App />
     <ToastContainer />
+    <div id="recaptcha-container"></div>
   </BrowserRouter>
 );

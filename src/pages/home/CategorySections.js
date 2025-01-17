@@ -13,12 +13,14 @@ import { AiFillHeart } from "react-icons/ai";
 import { fetchDataByField, fetchDataByPath } from "../../realtimedatabase";
 import React, { useState, useEffect } from "react";
 import "./Home.css";
+import { useNavigate } from "react-router-dom";
 
 function CategorySection({ title, filter }) {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [books, setBooks] = useState([]);
   const [favourites, setFavourites] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => {
@@ -33,6 +35,14 @@ function CategorySection({ title, filter }) {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  function getDividedValue(screenWidth) {
+    if (screenWidth > 1150) return 2;
+    if (screenWidth > 900) return 3;
+    if (screenWidth > 750) return 4;
+    if (screenWidth > 500) return 5;
+    return 6;
+  }
 
   // Fetch books only once when the component mounts
   useEffect(() => {
@@ -70,6 +80,13 @@ function CategorySection({ title, filter }) {
         : [...prevFavourites, id]
     );
   };
+
+  const handleClick = () => {
+    // Passing the list via state
+    navigate("/viewall", {
+      state: books,
+    });
+  };
   return (
     <div>
       <Box
@@ -85,7 +102,9 @@ function CategorySection({ title, filter }) {
         }}
       >
         <Typography variant="h6">{title}</Typography>
-        <Button variant="text">View All</Button>
+        <Button variant="text" onClick={handleClick}>
+          View All
+        </Button>
       </Box>
       {loading ? (
         <Box
@@ -104,7 +123,7 @@ function CategorySection({ title, filter }) {
             overflowX: "auto",
             display: "flex",
             marginLeft: screenWidth > 1000 ? "200px" : "0px",
-            marginTop:filter===""? "64px":"0px",
+            marginTop: filter === "" ? "64px" : "0px",
             whiteSpace: "nowrap",
             scrollbarWidth: "none", // Hide scrollbar for Firefox
             msOverflowStyle: "none", // Hide scrollbar for IE & Edge
@@ -163,12 +182,15 @@ function CategorySection({ title, filter }) {
                           <AiFillHeart fontSize="medium" />
                         </IconButton>
                       </div>
-                      <CardContent sx={{ height: "25%" }}>
+                      <CardContent sx={{ height: "40%" }}>
                         <Typography
-                          variant="caption"
+                          variant="body2"
                           sx={{
                             overflow: "hidden",
-                            textOverflow: "",
+                            textOverflow: "ellipsis",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: "vertical",
                           }}
                         >
                           {book.booknm}
@@ -188,7 +210,7 @@ function CategorySection({ title, filter }) {
                   {books.slice(0, 4).map((book, index) => (
                     <Grid
                       item
-                      xs={6}
+                      xs={getDividedValue(screenWidth)}
                       key={book.booknm}
                       sx={{ marginBottom: "20px", paddingBottom: "5px" }} // Add space after first 2 cards
                     >
@@ -241,14 +263,15 @@ function CategorySection({ title, filter }) {
                         </Box>
 
                         {/* Book Name */}
-                        <CardContent sx={{ height: "35%" }}>
+                        <CardContent sx={{ height: "40%" }}>
                           <Typography
                             variant="body2"
-                            noWrap
                             sx={{
                               overflow: "hidden",
                               textOverflow: "ellipsis",
-                              maxHeight: "50px",
+                              display: "-webkit-box",
+                              WebkitLineClamp: 3,
+                              WebkitBoxOrient: "vertical",
                             }}
                           >
                             {book.booknm}
@@ -260,7 +283,7 @@ function CategorySection({ title, filter }) {
                 </Grid>
               </Box>
             )
-          ) :null}
+          ) : null}
         </Box>
       )}
     </div>

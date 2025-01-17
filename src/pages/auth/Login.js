@@ -12,6 +12,7 @@ import {
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { auth, RecaptchaVerifier, signInWithPhoneNumber } from "../../firebase";
+import { fetchDataByPath } from "../../realtimedatabase";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import "../home/Home.css";
@@ -20,7 +21,6 @@ import { useNavigate } from "react-router-dom";
 import OTPInput from "otp-input-react";
 
 const Login = () => {
-  const [step, setStep] = useState(1);
   const [userData, setUserData] = useState({
     countryCode: "+91",
     phone: "",
@@ -50,8 +50,6 @@ const Login = () => {
 
   // Handle Phone Verification
   const verifyCaptcha = async () => {
-    if (!validatePhoneNumber(userData.phone)) return;
-
     try {
       window.recaptchaVerifier = new RecaptchaVerifier(
         auth,
@@ -95,6 +93,9 @@ const Login = () => {
     let newErrors = {};
     try {
       await confirmationResult.confirm(userData.otp);
+      const phoneNumber = `+${userData.countryCode}${userData.phone}`;
+      const data = await fetchDataByPath(`Users/${phoneNumber}`);
+      localStorage.setItem("user", JSON.stringify(data));
       toast.success(`Logged In Successfully`, {
         position: "top-right",
         autoClose: 3000,
@@ -113,12 +114,21 @@ const Login = () => {
   };
 
   // Validate Phone Number
-  const validatePhoneNumber = (value) => {
+  const validatePhoneNumber = async () => {
     let newErrors = {};
-    if (!value.trim()) {
+    if (!userData.phone.trim()) {
       newErrors.phone = "Phone number is required";
-    } else if (!/^\d{10}$/.test(value)) {
+    } else if (!/^\d{10}$/.test(userData.phone)) {
       newErrors.phone = "Enter a valid 10-digit phone number";
+    } else {
+      const phoneNumber = `+${userData.countryCode}${userData.phone}`;
+      const data = await fetchDataByPath(`Users/${phoneNumber}`);
+      console.log(data);
+      if (data === null) {
+        newErrors.phone = "Phone no. does not exist.";
+      } else {
+        verifyCaptcha();
+      }
     }
 
     setErrors(newErrors);
@@ -193,7 +203,7 @@ const Login = () => {
               backgroundColor: "black",
               color: "white",
             }}
-            onClick={verifyCaptcha}
+            onClick={validatePhoneNumber}
             sx={{ mt: 2 }}
           >
             Send OTP

@@ -8,15 +8,7 @@ import {
   ListItemIcon,
   IconButton,
   Box,
-  Typography,
-  Button,
-  CircularProgress,
-  Grid,
-  Card,
-  CardMedia,
-  CardContent,
 } from "@mui/material";
-import { AiFillHeart } from "react-icons/ai";
 import {
   HiOutlineMenuAlt2,
   HiOutlineUserAdd,
@@ -28,7 +20,7 @@ import {
   HiOutlineLogout,
 } from "react-icons/hi";
 import { BiCategory } from "react-icons/bi";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import "./Home.css";
 import "./CategorySections";
 import { useNavigate } from "react-router-dom";
@@ -43,12 +35,10 @@ function Home() {
 
   const menuItems = [
     { text: "Home", icon: <HiOutlineHome /> },
-    { text: "My Profile", icon: <HiOutlineUser /> },
     { text: "Categories", icon: <BiCategory /> },
     { text: "Favourites", icon: <HiOutlineHeart /> },
     { text: "Suggestions", icon: <HiOutlineChat /> },
     { text: "Upload", icon: <HiOutlineUpload /> },
-    { text: "Logout", icon: <HiOutlineLogout /> },
   ];
 
   const toggleDrawer = (open) => () => {
@@ -68,6 +58,17 @@ function Home() {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  const getInitials = () => {
+    try {
+      const parsedData = JSON.parse(localStorage.getItem("user"));
+      const firstInitial = parsedData.firstName.charAt(0).toUpperCase();
+      const lastInitial = parsedData.lastName.charAt(0).toUpperCase();
+      return firstInitial + lastInitial;
+    } catch (e) {
+      return "US";
+    }
+  };
 
   return (
     <div className="App">
@@ -92,13 +93,41 @@ function Home() {
           <span className="title">ClassMates</span>
 
           {screenWidth > 1000 ? (
-            <button
+            localStorage.getItem("user") ? (
+              <button
+                edge="end"
+                className="rounded-button"
+                onClick={() => {
+                  navigate("/");
+                  localStorage.removeItem("user");
+                }}
+              >
+                Logout
+              </button>
+            ) : (
+              <button
+                edge="end"
+                className="rounded-button"
+                onClick={() => navigate("/signup")}
+              >
+                Sign Up
+              </button>
+            )
+          ) : localStorage.getItem("user") ? (
+            <IconButton
+              style={{
+                color: "#000000",
+                border: "2px solid black",
+                background: "#fefcc1",
+              }}
               edge="end"
-              className="rounded-button"
-              onClick={() => navigate("/signup")}
+              onClick={() => {
+                navigate("/");
+                localStorage.removeItem("user");
+              }}
             >
-              Sign Up
-            </button>
+              <HiOutlineLogout />
+            </IconButton>
           ) : (
             <IconButton
               style={{
@@ -127,15 +156,26 @@ function Home() {
         {/* 🔹 Drawer Header */}
         <Box
           sx={{
+            alignContent: "center",
+            justifyContent: "center",
+            alignItems: "center",
+            justifyItems: "center",
             textAlign: "center",
             padding: "16px",
             bgcolor: "white",
             color: "black",
           }}
         >
-          <button className="rounded-button" onClick={() => navigate("/login")}>
-            Sign In
-          </button>
+          {localStorage.getItem("user") ? (
+            <div className="circle">{getInitials()}</div>
+          ) : (
+            <button
+              className="rounded-button"
+              onClick={() => navigate("/login")}
+            >
+              Sign In
+            </button>
+          )}
         </Box>
         <List>
           {menuItems.map((item, index) => (
@@ -158,6 +198,23 @@ function Home() {
             </div>
           ))}
         </List>
+        {localStorage.getItem("user") ? (
+          <div
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              navigate("/");
+              localStorage.removeItem("user");
+            }}
+          >
+            <ListItem button key={6} onClick={toggleDrawer(false)}>
+              <ListItemIcon>
+                <HiOutlineLogout />
+              </ListItemIcon>{" "}
+              {/* Icon Added */}
+              <ListItemText primary="Logout" />
+            </ListItem>
+          </div>
+        ) : null}
       </Drawer>
 
       <CategorySection title="All Books" filter="" />

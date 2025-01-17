@@ -92,3 +92,16 @@ div {
   scrollbar-width: none;
   -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
 }
+
+.circle {
+  width: calc(25px + 5vmin);        /* Width of the circle */
+  height: calc(25px + 5vmin);       /* Height of the circle */
+  border-radius: 50%;  /* This makes it circular */
+  border: 5px solid black;  /* Black border */
+  display: flex;       /* Flexbox for centering the content */
+  justify-content: center;  /* Center horizontally */
+  align-items: center;      /* Center vertically */
+  font-size: calc(8px + 2vmin);          /* Font size for the text */
+  font-weight: bold;  
+  background-color: #fefcc1;      /* Bold text */
+}
