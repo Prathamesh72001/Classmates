@@ -37,8 +37,15 @@ function Home() {
   const menuItems = [
     { text: "Home", icon: <HiOutlineHome /> },
     { text: "Categories", icon: <BiCategory /> },
-    { text: "Suggestions", icon: <HiOutlineChat /> },
+  ];
+
+  const loggedInMenuItems = [
+    { text: "Home", icon: <HiOutlineHome /> },
+    { text: "Categories", icon: <BiCategory /> },
+    { text: "Favourites", icon: <HiOutlineHeart /> },
     { text: "Upload", icon: <HiOutlineUpload /> },
+    { text: "Suggestions", icon: <HiOutlineChat /> },
+    { text: "Logout", icon: <HiOutlineLogout /> },
   ];
 
   const toggleDrawer = (open) => () => {
@@ -178,62 +185,52 @@ function Home() {
           )}
         </Box>
         <List>
-          {menuItems.map((item, index) => (
-            <div
-              onClick={() => {
-                setActiveTab("tab" + (index + 1));
-              }}
-            >
-              <ListItem
-                button
-                key={index}
-                onClick={toggleDrawer(false)} // Close drawer when clicking a tab
-                className={`menu ${
-                  activeTab === "tab" + (index + 1) ? "active" : ""
-                }`}
-              >
-                <ListItemIcon>{item.icon}</ListItemIcon> {/* Icon Added */}
-                <ListItemText primary={item.text} />
-              </ListItem>
-            </div>
-          ))}
+          {localStorage.getItem("user")
+            ? loggedInMenuItems.map((item, index) => (
+                <div
+                  onClick={() => {
+                    if (index === 5) {
+                      localStorage.removeItem("user");
+                      navigate("/");
+                      setActiveTab("tab1");
+                    } else {
+                      setActiveTab("tab" + (index + 1));
+                    }
+                  }}
+                >
+                  <ListItem
+                    button
+                    key={index}
+                    onClick={toggleDrawer(false)} // Close drawer when clicking a tab
+                    className={`menu ${
+                      activeTab === "tab" + (index + 1) ? "active" : ""
+                    }`}
+                  >
+                    <ListItemIcon>{item.icon}</ListItemIcon> {/* Icon Added */}
+                    <ListItemText primary={item.text} />
+                  </ListItem>
+                </div>
+              ))
+            : menuItems.map((item, index) => (
+                <div
+                  onClick={() => {
+                    setActiveTab("tab" + (index + 1));
+                  }}
+                >
+                  <ListItem
+                    button
+                    key={index}
+                    onClick={toggleDrawer(false)} // Close drawer when clicking a tab
+                    className={`menu ${
+                      activeTab === "tab" + (index + 1) ? "active" : ""
+                    }`}
+                  >
+                    <ListItemIcon>{item.icon}</ListItemIcon> {/* Icon Added */}
+                    <ListItemText primary={item.text} />
+                  </ListItem>
+                </div>
+              ))}
         </List>
-        {localStorage.getItem("user") ? (
-          <div style={{ cursor: "pointer" }}>
-            <ListItem
-              button
-              key={5}
-              onClick={() => {
-                toggleDrawer(false);
-                setActiveTab("tab5");
-              }}
-              className={`menu ${
-                activeTab === "tab5" ? "active" : ""
-              }`}
-            >
-              <ListItemIcon>
-                <HiOutlineHeart />
-              </ListItemIcon>{" "}
-              {/* Icon Added */}
-              <ListItemText primary="Favourites" />
-            </ListItem>
-            <ListItem
-              button
-              key={6}
-              onClick={() => {
-                toggleDrawer(false);
-                navigate("/");
-                localStorage.removeItem("user");
-              }}
-            >
-              <ListItemIcon>
-                <HiOutlineLogout />
-              </ListItemIcon>{" "}
-              {/* Icon Added */}
-              <ListItemText primary="Logout" />
-            </ListItem>
-          </div>
-        ) : null}
       </Drawer>
 
       {activeTab === "tab1" && (
@@ -248,7 +245,7 @@ function Home() {
         </>
       )}
 
-      {activeTab === "tab5" && <Favourites />}
+      {activeTab === "tab3" && <Favourites />}
     </div>
   );
 }

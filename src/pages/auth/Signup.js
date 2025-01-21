@@ -293,7 +293,7 @@ const Signup = () => {
             inputStyle={{ width: "100%", height: "40px" }}
             dropdownStyle={{ textAlign: "left" }}
             isValid={() => !errors.phone}
-            inputProps={{ name: "phone", required: true }}
+            inputProps={{ name: "phone", required: true, maxLength: 13 }}
             enableLongNumbers={true}
             autoFormat={false} // Try disabling auto formatting (though it may not remove all formatting)
             countryCodeEditable={false}
