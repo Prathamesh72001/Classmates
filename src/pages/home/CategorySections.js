@@ -10,10 +10,18 @@ import {
   CardContent,
 } from "@mui/material";
 import { AiFillHeart } from "react-icons/ai";
-import { fetchDataByField, fetchDataByPath } from "../../realtimedatabase";
+import {
+  fetchDataByField,
+  fetchDataByPath,
+  addDataByPath,
+  removeDataByPath,
+} from "../../realtimedatabase";
+import { getFileUrl } from "../../storage";
 import React, { useState, useEffect } from "react";
 import "./Home.css";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function CategorySection({ title, filter }) {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
@@ -73,12 +81,49 @@ function CategorySection({ title, filter }) {
     getBooks();
   }, []);
 
-  const toggleFavorite = (id) => {
-    setFavourites((prevFavourites) =>
-      prevFavourites.includes(id)
-        ? prevFavourites.filter((fav) => fav !== id)
-        : [...prevFavourites, id]
-    );
+  useEffect(() => {
+    const getFavourites = async () => {
+      setLoading(true);
+      try {
+        if (localStorage.getItem("user")) {
+          const parsedData = JSON.parse(localStorage.getItem("user"));
+          const phoneNumber = `+${parsedData.countryCode}${parsedData.phone}`;
+          const data = await fetchDataByPath(`Favourite Books/${phoneNumber}`); // Specify the path to fetch data from
+          const booksArray = Object.keys(data).map((key) => ({
+            id: key,
+            ...data[key],
+          }));
+          setFavourites(booksArray); // Set filtered data to state
+        }
+      } catch (error) {
+        setFavourites([]);
+        console.error("Error fetching books:", error);
+      }
+      setLoading(false);
+    };
+    getFavourites();
+  }, []);
+
+  const toggleFavorite = async (book) => {
+    if (localStorage.getItem("user")) {
+      const parsedData = JSON.parse(localStorage.getItem("user"));
+      const phoneNumber = `+${parsedData.countryCode}${parsedData.phone}`;
+      setFavourites((prevFavourites) => {
+        if (prevFavourites.includes(book)) {
+          removeDataByPath(`Favourite Books/${phoneNumber}/${book.booknm}`);
+        } else {
+          addDataByPath(`Favourite Books/${phoneNumber}/${book.booknm}`, book);
+        }
+        return prevFavourites.includes(book)
+          ? prevFavourites.filter((fav) => fav !== book)
+          : [...prevFavourites, book];
+      });
+    } else {
+      toast.error("Please Login to add books to Favourite", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
   };
 
   const handleClick = () => {
@@ -87,6 +132,7 @@ function CategorySection({ title, filter }) {
       state: books,
     });
   };
+
   return (
     <div>
       <Box
@@ -145,6 +191,7 @@ function CategorySection({ title, filter }) {
                         marginRight: "5px",
                         marginTop: "2px",
                         marginBottom: "2px",
+                        cursor: "pointer",
                       }}
                     >
                       <CardMedia
@@ -153,6 +200,19 @@ function CategorySection({ title, filter }) {
                         image={book.bookimg}
                         alt={book.booknm}
                         sx={{ borderRadius: 5 }}
+                        onClick={async () => {
+                          // Passing the list via state
+                          console.log("clicked");
+                          const data = await getFileUrl(
+                            "Books",
+                            `${book.booknm}.${book.bookfrmt}`
+                          );
+                          if (data !== null) {
+                            navigate("/pdfviewer", {
+                              state: data,
+                            });
+                          }
+                        }}
                       />
                       {/* Heart Icon */}
                       <div
@@ -172,9 +232,11 @@ function CategorySection({ title, filter }) {
                         }}
                       >
                         <IconButton
-                          onClick={() => toggleFavorite(book.booknm)}
+                          onClick={() => toggleFavorite(book)}
                           sx={{
-                            color: favourites.includes(book.booknm)
+                            color: favourites.find(
+                              (item) => item.booknm === book.booknm
+                            )
                               ? "red"
                               : "#D3D3D3",
                           }}
@@ -251,9 +313,11 @@ function CategorySection({ title, filter }) {
                           }}
                         >
                           <IconButton
-                            onClick={() => toggleFavorite(book.booknm)}
+                            onClick={() => toggleFavorite(book)}
                             sx={{
-                              color: favourites.includes(book.booknm)
+                              color: favourites.find(
+                                (item) => item.booknm === book.booknm
+                              )
                                 ? "red"
                                 : "grey",
                             }}

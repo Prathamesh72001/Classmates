@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { AiFillHeart } from "react-icons/ai";
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getFileUrl } from "../storage";
 import {
   fetchDataByPath,
@@ -19,15 +19,14 @@ import {
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-function ViewAll() {
+function Favourites() {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [favourites, setFavourites] = useState([]);
-  const location = useLocation();
-  const data = location.state;
   const navigate = useNavigate();
 
   function getDividedValue(screenWidth) {
     if (screenWidth > 1150) return 2;
+    if (screenWidth > 1000) return 2.5
     if (screenWidth > 900) return 3;
     if (screenWidth > 750) return 4;
     if (screenWidth > 500) return 5;
@@ -49,58 +48,59 @@ function ViewAll() {
   }, []);
 
   useEffect(() => {
-      const getFavourites = async () => {
-        try {
-          if (localStorage.getItem("user")) {
-            const parsedData = JSON.parse(localStorage.getItem("user"));
-            const phoneNumber = `+${parsedData.countryCode}${parsedData.phone}`;
-            const data = await fetchDataByPath(`Favourite Books/${phoneNumber}`); // Specify the path to fetch data from
-            const booksArray = Object.keys(data).map((key) => ({
-              id: key,
-              ...data[key],
-            }));
-            setFavourites(booksArray); // Set filtered data to state
-          }
-        } catch (error) {
-          setFavourites([]);
-          console.error("Error fetching books:", error);
+    const getFavourites = async () => {
+      try {
+        if (localStorage.getItem("user")) {
+          const parsedData = JSON.parse(localStorage.getItem("user"));
+          const phoneNumber = `+${parsedData.countryCode}${parsedData.phone}`;
+          const data = await fetchDataByPath(`Favourite Books/${phoneNumber}`); // Specify the path to fetch data from
+          const booksArray = Object.keys(data).map((key) => ({
+            id: key,
+            ...data[key],
+          }));
+          setFavourites(booksArray); // Set filtered data to state
         }
-      };
-      getFavourites();
-    }, []);
-  
-    const toggleFavorite = async (book) => {
-      if (localStorage.getItem("user")) {
-        const parsedData = JSON.parse(localStorage.getItem("user"));
-        const phoneNumber = `+${parsedData.countryCode}${parsedData.phone}`;
-        setFavourites((prevFavourites) => {
-          if (prevFavourites.includes(book)) {
-            removeDataByPath(`Favourite Books/${phoneNumber}/${book.booknm}`);
-          } else {
-            addDataByPath(`Favourite Books/${phoneNumber}/${book.booknm}`, book);
-          }
-          return prevFavourites.includes(book)
-            ? prevFavourites.filter((fav) => fav !== book)
-            : [...prevFavourites, book];
-        });
-      } else {
-        toast.error("Please Login to add books to Favourite", {
-          position: "top-right",
-          autoClose: 3000,
-        });
+      } catch (error) {
+        setFavourites([]);
+        console.error("Error fetching books:", error);
       }
     };
+    getFavourites();
+  }, []);
+
+  const toggleFavorite = async (book) => {
+    if (localStorage.getItem("user")) {
+      const parsedData = JSON.parse(localStorage.getItem("user"));
+      const phoneNumber = `+${parsedData.countryCode}${parsedData.phone}`;
+      setFavourites((prevFavourites) => {
+        if (prevFavourites.includes(book)) {
+          removeDataByPath(`Favourite Books/${phoneNumber}/${book.booknm}`);
+        } else {
+          addDataByPath(`Favourite Books/${phoneNumber}/${book.booknm}`, book);
+        }
+        return prevFavourites.includes(book)
+          ? prevFavourites.filter((fav) => fav !== book)
+          : [...prevFavourites, book];
+      });
+    } else {
+      toast.error("Please Login to add books to Favourite", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      navigate("/");
+    }
+  };
 
   return (
     <div className="App">
-      {data.length !== 0 ? (
+      {favourites.length !== 0 ? (
         <Grid container spacing={2}>
-          {data.map((book, index) => (
+          {favourites.map((book, index) => (
             <Grid
               item
               xs={getDividedValue(screenWidth)}
               key={book.booknm}
-              sx={{ marginBottom: "20px", paddingBottom: "5px" }} // Add space after first 2 cards
+              sx={{ marginBottom: "20px", paddingBottom: "5px", marginLeft: screenWidth > 1000 ? "200px" : "0px", marginTop:"75px"}} // Add space after first 2 cards
             >
               <Card
                 sx={{
@@ -110,8 +110,9 @@ function ViewAll() {
                   marginLeft: "5px",
                   marginRight: "5px",
                   position: "relative", // Ensures absolute positioning of Heart Icon works
-                  cursor:"pointer"
+                  cursor: "pointer",
                 }}
+            
               >
                 {/* Book Image */}
                 <CardMedia
@@ -155,12 +156,12 @@ function ViewAll() {
                   <IconButton
                     onClick={() => toggleFavorite(book)}
                     sx={{
-                      color: favourites.find(
-                        (item) => item.booknm === book.booknm
-                      )
-                        ? "red"
-                        : "#D3D3D3",
-                    }}
+                        color: favourites.find(
+                          (item) => item.booknm === book.booknm
+                        )
+                          ? "red"
+                          : "#D3D3D3",
+                      }}
                   >
                     <AiFillHeart fontSize="medium" />
                   </IconButton>
@@ -191,4 +192,4 @@ function ViewAll() {
     </div>
   );
 }
-export default ViewAll;
+export default Favourites;

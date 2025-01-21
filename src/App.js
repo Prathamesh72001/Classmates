@@ -4,7 +4,8 @@ import Home from "./pages/home/Home";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import About from "./pages/About";
-import ViewAll from "./pages/ViewAll"
+import ViewAll from "./pages/ViewAll";
+import PDFViewer from "./pages/PDFViewer";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
@@ -18,6 +19,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/viewall" element={<ViewAll/>}/>
+          <Route path="/pdfviewer" element={<PDFViewer/>}/>
           <Route path="*" element={<NotFound />} />
         </Routes>
     </div>

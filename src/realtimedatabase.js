@@ -1,6 +1,6 @@
 // src/firebaseUtils.js
 import { database } from "./firebase"; // Import your initialized Firebase app
-import { ref, get, set, query, orderByChild, equalTo } from "firebase/database";
+import { ref, get, set, query, orderByChild, equalTo,remove } from "firebase/database";
 
 // **Fetch Data by Path**: Fetch data from a specific path (e.g., users, posts)
 export const fetchDataByPath = async (path) => {
@@ -23,6 +23,24 @@ export const addDataByPath = async (path, data) => {
   const dbRef = ref(database, path);
   try {
     await set(dbRef, data)
+      .then(() => {
+        console.log("Success");
+        return true;
+      })
+      .catch((error) => {
+        console.error("Error adding data:", error);
+        return false;
+      });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+export const removeDataByPath = async (path, data) => {
+  const dbRef = ref(database, path);
+  try {
+    await remove(dbRef, data)
       .then(() => {
         console.log("Success");
         return true;

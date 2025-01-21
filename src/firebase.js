@@ -3,6 +3,8 @@ import { initializeApp } from "firebase/app";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 import { getDatabase } from "firebase/database";
+import { getStorage } from'firebase/storage';  // Import Firebase Storage
+
 // 🔹 Replace with your Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyBONYLVsNL1StzsJbPSx3D6aRTx5HJaf8s",
@@ -23,6 +25,7 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);         // Authentication
 export const analytics = getAnalytics(app); 
 export const database = getDatabase(app); 
+export const storage = getStorage(app); 
 export { RecaptchaVerifier, signInWithPhoneNumber };     // Firestore Database
 export default app;
 

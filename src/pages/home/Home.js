@@ -25,6 +25,7 @@ import "./Home.css";
 import "./CategorySections";
 import { useNavigate } from "react-router-dom";
 import CategorySection from "./CategorySections";
+import Favourites from "../Favourites";
 
 function Home() {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -36,7 +37,6 @@ function Home() {
   const menuItems = [
     { text: "Home", icon: <HiOutlineHome /> },
     { text: "Categories", icon: <BiCategory /> },
-    { text: "Favourites", icon: <HiOutlineHeart /> },
     { text: "Suggestions", icon: <HiOutlineChat /> },
     { text: "Upload", icon: <HiOutlineUpload /> },
   ];
@@ -199,14 +199,33 @@ function Home() {
           ))}
         </List>
         {localStorage.getItem("user") ? (
-          <div
-            style={{ cursor: "pointer" }}
-            onClick={() => {
-              navigate("/");
-              localStorage.removeItem("user");
-            }}
-          >
-            <ListItem button key={6} onClick={toggleDrawer(false)}>
+          <div style={{ cursor: "pointer" }}>
+            <ListItem
+              button
+              key={5}
+              onClick={() => {
+                toggleDrawer(false);
+                setActiveTab("tab5");
+              }}
+              className={`menu ${
+                activeTab === "tab5" ? "active" : ""
+              }`}
+            >
+              <ListItemIcon>
+                <HiOutlineHeart />
+              </ListItemIcon>{" "}
+              {/* Icon Added */}
+              <ListItemText primary="Favourites" />
+            </ListItem>
+            <ListItem
+              button
+              key={6}
+              onClick={() => {
+                toggleDrawer(false);
+                navigate("/");
+                localStorage.removeItem("user");
+              }}
+            >
               <ListItemIcon>
                 <HiOutlineLogout />
               </ListItemIcon>{" "}
@@ -217,13 +236,19 @@ function Home() {
         ) : null}
       </Drawer>
 
-      <CategorySection title="All Books" filter="" />
+      {activeTab === "tab1" && (
+        <>
+          <CategorySection title="All Books" filter="" />
 
-      <CategorySection title="SSC Books" filter="SSC" />
+          <CategorySection title="SSC Books" filter="SSC" />
 
-      <CategorySection title="XI Books" filter="XI" />
+          <CategorySection title="XI Books" filter="XI" />
 
-      <CategorySection title="HSC Books" filter="HSC" />
+          <CategorySection title="HSC Books" filter="HSC" />
+        </>
+      )}
+
+      {activeTab === "tab5" && <Favourites />}
     </div>
   );
 }
