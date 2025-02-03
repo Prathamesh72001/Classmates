@@ -68,6 +68,27 @@ function ViewAll() {
       };
       getFavourites();
     }, []);
+
+    useEffect(() => {
+      const getData = async () => {
+        try {
+          if (localStorage.getItem("user")) {
+            const parsedData = JSON.parse(localStorage.getItem("user"));
+            const phoneNumber = `+${parsedData.countryCode}${parsedData.phone}`;
+            const data = await fetchDataByPath(`Favourite Books/${phoneNumber}`); // Specify the path to fetch data from
+            const booksArray = Object.keys(data).map((key) => ({
+              id: key,
+              ...data[key],
+            }));
+            setFavourites(booksArray); // Set filtered data to state
+          }
+        } catch (error) {
+          setFavourites([]);
+          console.error("Error fetching books:", error);
+        }
+      };
+      getFavourites();
+    }, []);
   
     const toggleFavorite = async (book) => {
       if (localStorage.getItem("user")) {

@@ -26,6 +26,7 @@ import "./CategorySections";
 import { useNavigate } from "react-router-dom";
 import CategorySection from "./CategorySections";
 import Favourites from "../Favourites";
+import Category from "../Category";
 
 function Home() {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -244,7 +245,7 @@ function Home() {
           <CategorySection title="HSC Books" filter="HSC" />
         </>
       )}
-
+      {activeTab === "tab2" && <Category />}
       {activeTab === "tab3" && <Favourites />}
     </div>
   );
