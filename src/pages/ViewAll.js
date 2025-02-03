@@ -49,68 +49,68 @@ function ViewAll() {
   }, []);
 
   useEffect(() => {
-      const getFavourites = async () => {
-        try {
-          if (localStorage.getItem("user")) {
-            const parsedData = JSON.parse(localStorage.getItem("user"));
-            const phoneNumber = `+${parsedData.countryCode}${parsedData.phone}`;
-            const data = await fetchDataByPath(`Favourite Books/${phoneNumber}`); // Specify the path to fetch data from
-            const booksArray = Object.keys(data).map((key) => ({
-              id: key,
-              ...data[key],
-            }));
-            setFavourites(booksArray); // Set filtered data to state
-          }
-        } catch (error) {
-          setFavourites([]);
-          console.error("Error fetching books:", error);
+    const getFavourites = async () => {
+      try {
+        if (localStorage.getItem("user")) {
+          const parsedData = JSON.parse(localStorage.getItem("user"));
+          const phoneNumber = `+${parsedData.countryCode}${parsedData.phone}`;
+          const data = await fetchDataByPath(`Favourite Books/${phoneNumber}`); // Specify the path to fetch data from
+          const booksArray = Object.keys(data).map((key) => ({
+            id: key,
+            ...data[key],
+          }));
+          setFavourites(booksArray); // Set filtered data to state
         }
-      };
-      getFavourites();
-    }, []);
-
-    useEffect(() => {
-      const getFavourites = async () => {
-        try {
-          if (localStorage.getItem("user")) {
-            const parsedData = JSON.parse(localStorage.getItem("user"));
-            const phoneNumber = `+${parsedData.countryCode}${parsedData.phone}`;
-            const data = await fetchDataByPath(`Favourite Books/${phoneNumber}`); // Specify the path to fetch data from
-            const booksArray = Object.keys(data).map((key) => ({
-              id: key,
-              ...data[key],
-            }));
-            setFavourites(booksArray); // Set filtered data to state
-          }
-        } catch (error) {
-          setFavourites([]);
-          console.error("Error fetching books:", error);
-        }
-      };
-      getFavourites();
-    }, []);
-  
-    const toggleFavorite = async (book) => {
-      if (localStorage.getItem("user")) {
-        const parsedData = JSON.parse(localStorage.getItem("user"));
-        const phoneNumber = `+${parsedData.countryCode}${parsedData.phone}`;
-        setFavourites((prevFavourites) => {
-          if (prevFavourites.includes(book)) {
-            removeDataByPath(`Favourite Books/${phoneNumber}/${book.booknm}`);
-          } else {
-            addDataByPath(`Favourite Books/${phoneNumber}/${book.booknm}`, book);
-          }
-          return prevFavourites.includes(book)
-            ? prevFavourites.filter((fav) => fav !== book)
-            : [...prevFavourites, book];
-        });
-      } else {
-        toast.error("Please Login to add books to Favourite", {
-          position: "top-right",
-          autoClose: 3000,
-        });
+      } catch (error) {
+        setFavourites([]);
+        console.error("Error fetching books:", error);
       }
     };
+    getFavourites();
+  }, []);
+
+  useEffect(() => {
+    const getFavourites = async () => {
+      try {
+        if (localStorage.getItem("user")) {
+          const parsedData = JSON.parse(localStorage.getItem("user"));
+          const phoneNumber = `+${parsedData.countryCode}${parsedData.phone}`;
+          const data = await fetchDataByPath(`Favourite Books/${phoneNumber}`); // Specify the path to fetch data from
+          const booksArray = Object.keys(data).map((key) => ({
+            id: key,
+            ...data[key],
+          }));
+          setFavourites(booksArray); // Set filtered data to state
+        }
+      } catch (error) {
+        setFavourites([]);
+        console.error("Error fetching books:", error);
+      }
+    };
+    getFavourites();
+  }, []);
+
+  const toggleFavorite = async (book) => {
+    if (localStorage.getItem("user")) {
+      const parsedData = JSON.parse(localStorage.getItem("user"));
+      const phoneNumber = `+${parsedData.countryCode}${parsedData.phone}`;
+      setFavourites((prevFavourites) => {
+        if (prevFavourites.includes(book)) {
+          removeDataByPath(`Favourite Books/${phoneNumber}/${book.booknm}`);
+        } else {
+          addDataByPath(`Favourite Books/${phoneNumber}/${book.booknm}`, book);
+        }
+        return prevFavourites.includes(book)
+          ? prevFavourites.filter((fav) => fav !== book)
+          : [...prevFavourites, book];
+      });
+    } else {
+      toast.error("Please Login to add books to Favourite", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+  };
 
   return (
     <div className="App">
@@ -131,7 +131,7 @@ function ViewAll() {
                   marginLeft: "5px",
                   marginRight: "5px",
                   position: "relative", // Ensures absolute positioning of Heart Icon works
-                  cursor:"pointer"
+                  cursor: "pointer",
                 }}
               >
                 {/* Book Image */}
@@ -142,15 +142,21 @@ function ViewAll() {
                   alt={book.booknm}
                   sx={{ borderRadius: 5 }}
                   onClick={async () => {
-                    // Passing the list via state
-                    console.log("clicked");
-                    const data = await getFileUrl(
-                      "Books",
-                      `${book.booknm}.${book.bookfrmt}`
-                    );
-                    if (data !== null) {
-                      navigate("/pdfviewer", {
-                        state: data,
+                    if (localStorage.getItem("user")) {
+                      // Passing the list via state
+                      const data = await getFileUrl(
+                        "Books",
+                        `${book.booknm}.${book.bookfrmt}`
+                      );
+                      if (data !== null) {
+                        navigate("/pdfviewer", {
+                          state: data,
+                        });
+                      }
+                    } else {
+                      toast.error("Please Login to open book", {
+                        position: "top-right",
+                        autoClose: 3000,
                       });
                     }
                   }}

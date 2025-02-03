@@ -201,16 +201,25 @@ function CategorySection({ title, filter }) {
                         alt={book.booknm}
                         sx={{ borderRadius: 5 }}
                         onClick={async () => {
-                          // Passing the list via state
-                          console.log("clicked");
-                          const data = await getFileUrl(
-                            "Books",
-                            `${book.booknm}.${book.bookfrmt}`
-                          );
-                          if (data !== null) {
-                            navigate("/pdfviewer", {
-                              state: data,
-                            });
+                          if (localStorage.getItem("user")) {
+                            // Passing the list via state
+                            const data = await getFileUrl(
+                              "Books",
+                              `${book.booknm}.${book.bookfrmt}`
+                            );
+                            if (data !== null) {
+                              navigate("/pdfviewer", {
+                                state: data,
+                              });
+                            }
+                          } else {
+                            toast.error(
+                              "Please Login to open book",
+                              {
+                                position: "top-right",
+                                autoClose: 3000,
+                              }
+                            );
                           }
                         }}
                       />

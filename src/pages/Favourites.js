@@ -26,7 +26,7 @@ function Favourites() {
 
   function getDividedValue(screenWidth) {
     if (screenWidth > 1150) return 2;
-    if (screenWidth > 1000) return 2.5
+    if (screenWidth > 1000) return 2.5;
     if (screenWidth > 900) return 3;
     if (screenWidth > 750) return 4;
     if (screenWidth > 500) return 5;
@@ -100,7 +100,12 @@ function Favourites() {
               item
               xs={getDividedValue(screenWidth)}
               key={book.booknm}
-              sx={{ marginBottom: "20px", paddingBottom: "5px", marginLeft: screenWidth > 1000 ? "200px" : "0px", marginTop:"75px"}} // Add space after first 2 cards
+              sx={{
+                marginBottom: "20px",
+                paddingBottom: "5px",
+                marginLeft: screenWidth > 1000 ? "200px" : "0px",
+                marginTop: "75px",
+              }} // Add space after first 2 cards
             >
               <Card
                 sx={{
@@ -112,7 +117,6 @@ function Favourites() {
                   position: "relative", // Ensures absolute positioning of Heart Icon works
                   cursor: "pointer",
                 }}
-            
               >
                 {/* Book Image */}
                 <CardMedia
@@ -122,15 +126,21 @@ function Favourites() {
                   alt={book.booknm}
                   sx={{ borderRadius: 5 }}
                   onClick={async () => {
-                    // Passing the list via state
-                    console.log("clicked");
-                    const data = await getFileUrl(
-                      "Books",
-                      `${book.booknm}.${book.bookfrmt}`
-                    );
-                    if (data !== null) {
-                      navigate("/pdfviewer", {
-                        state: data,
+                    if (localStorage.getItem("user")) {
+                      // Passing the list via state
+                      const data = await getFileUrl(
+                        "Books",
+                        `${book.booknm}.${book.bookfrmt}`
+                      );
+                      if (data !== null) {
+                        navigate("/pdfviewer", {
+                          state: data,
+                        });
+                      }
+                    } else {
+                      toast.error("Please Login to open book", {
+                        position: "top-right",
+                        autoClose: 3000,
                       });
                     }
                   }}
@@ -156,12 +166,12 @@ function Favourites() {
                   <IconButton
                     onClick={() => toggleFavorite(book)}
                     sx={{
-                        color: favourites.find(
-                          (item) => item.booknm === book.booknm
-                        )
-                          ? "red"
-                          : "#D3D3D3",
-                      }}
+                      color: favourites.find(
+                        (item) => item.booknm === book.booknm
+                      )
+                        ? "red"
+                        : "#D3D3D3",
+                    }}
                   >
                     <AiFillHeart fontSize="medium" />
                   </IconButton>
