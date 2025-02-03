@@ -70,7 +70,7 @@ function ViewAll() {
     }, []);
 
     useEffect(() => {
-      const getData = async () => {
+      const getFavourites = async () => {
         try {
           if (localStorage.getItem("user")) {
             const parsedData = JSON.parse(localStorage.getItem("user"));
